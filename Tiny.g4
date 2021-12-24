@@ -15,6 +15,7 @@ OP_PAR: '(' ;
 CL_PAR: ')' ;
 NUMBER: '0'..'9'+ ;
 
+COMMENT: '//' ~('\n')*       -> skip ;
 SPACE: (' '|'\t'|'\r'|'\n')+ -> skip ;
 
 /*---------------- PARSER RULES ----------------*/
