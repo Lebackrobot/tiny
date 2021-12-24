@@ -3,8 +3,8 @@
 
 import sys
 from antlr4 import *
-from modules.tinyLexer  import TinyLexer
-from modules.tinyParser import TinyParser
+from TinyLexer  import TinyLexer
+from TinyParser import TinyParser
 
 if len(sys.argv) > 1:
     sys.stdin = open(sys.argv[1], 'r')

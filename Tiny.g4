@@ -9,14 +9,22 @@ grammar Tiny;
 
 /*---------------- LEXER RULES ----------------*/
 
+COMMENT: '//' ~('\n')*       -> skip ;
+SPACE: (' '|'\t'|'\r'|'\n')+ -> skip ;
+
 PLUS  : '+' ;
 TIMES : '*' ;
 OP_PAR: '(' ; 
 CL_PAR: ')' ;
+OP_CUR: '{' ;
+CL_CUR: '}' ; 
+
+FUNC        :   'func'   ;
+MAIN        :   'main'   ;
+PRINTLN     :   'println';
+
 NUMBER: '0'..'9'+ ;
 
-COMMENT: '//' ~('\n')*       -> skip ;
-SPACE: (' '|'\t'|'\r'|'\n')+ -> skip ;
 
 /*---------------- PARSER RULES ----------------*/
 
@@ -35,18 +43,35 @@ program:
     ;
 
 main:
-    {if 1:
+    FUNC MAIN OP_PAR CL_PAR OP_CUR
+    {if True:
         print('.method public static main([Ljava/lang/String;)V\n')
-        print('    getstatic java/lang/System/out Ljava/io/PrintStream;')
     }
-    expression
-    {if 1:
-        print('    invokevirtual java/io/PrintStream/println(I)V\n')
+    ( statement )* 
+    {if True:
         print('    return')
         print('.limit stack 10')
         print('.end method')
         # print('\n; symbol_table:', symbol_table)
     }
+    CL_CUR
+    ;
+
+statement:
+    st_println
+    ;
+
+st_println:
+    PRINTLN OP_PAR 
+    {if True:
+        print('    getstatic java/lang/System/out Ljava/io/PrintStream;')
+
+    } 
+    expression
+    {if True: 
+        print('    invokevirtual java/io/PrintStream/println(I)V\n')
+    }
+    CL_PAR
     ;
 
 expression:
