@@ -13,7 +13,10 @@ COMMENT: '//' ~('\n')*       -> skip ;
 SPACE: (' '|'\t'|'\r'|'\n')+ -> skip ;
 
 PLUS  : '+' ;
+MINUS : '-' ;
 TIMES : '*' ;
+OVER  : '/' ;
+REM   : '%' ;
 OP_PAR: '(' ; 
 CL_PAR: ')' ;
 OP_CUR: '{' ;
@@ -44,11 +47,11 @@ program:
 
 main:
     FUNC MAIN OP_PAR CL_PAR OP_CUR
-    {if True:
+    {if 1:
         print('.method public static main([Ljava/lang/String;)V\n')
     }
     ( statement )* 
-    {if True:
+    {if 1:
         print('    return')
         print('.limit stack 10')
         print('.end method')
@@ -63,30 +66,38 @@ statement:
 
 st_println:
     PRINTLN OP_PAR 
-    {if True:
+    {if 1:
         print('    getstatic java/lang/System/out Ljava/io/PrintStream;')
 
     } 
     expression
-    {if True: 
+    {if 1: 
         print('    invokevirtual java/io/PrintStream/println(I)V\n')
     }
     CL_PAR
     ;
 
 expression:
-    term ( op = PLUS expression
+    term ( op = ( PLUS | MINUS ) expression
     {if 1:
-        print('    iadd')
+        if $op.type == TinyParser.PLUS:
+            print('    iadd')
+        if $op.type == TinyParser.MINUS:
+            print('    isub')
     }
-    )?
+    )*
     ;
 
-term: factor ( op = TIMES term
+term: factor ( op = ( TIMES | OVER | REM ) term
     {if 1:
-        print('    imul')
+        if $op.type == TinyParser.TIMES:
+            print('    imult')
+        if $op.type == TinyParser.OVER:
+            print('    idiv')
+        if $op.type == TinyParser.REM:
+            print('    irem')
     }
-    )?
+    )*
     ;
 
 factor: 
